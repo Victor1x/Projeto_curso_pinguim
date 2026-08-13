@@ -1,0 +1,23 @@
+# Cores
+NC='\033[0m'
+BBlue='\033[1;34m'
+BRed='\033[1;31m'
+
+REGEX_ISSUE_ID="[a-zA-Z0-9,\.\_\-]+-[0-9]+"
+BRANCH_NAME=$(git symbolic-ref --short HEAD)
+ISSUE_ID=$(echo "$BRANCH_NAME" | grep -o -E "$REGEX_ISSUE_ID")
+COMMIT_MESSAGE=$(cat "$1")
+
+if [ -z "$ISSUE_ID" ]; then
+    printf "%bBranch não está no padrão esperado...%b\n" "$BRed" "$NC"
+    exit 1
+fi
+
+# Ex: se a branch é HEY-1-minha-feature, a mensagem deve começar com "HEY-1"
+case "$COMMIT_MESSAGE" in
+    "$ISSUE_ID"*)
+        exit 0
+        ;;
+esac
+
+echo "$ISSUE_ID: $COMMIT_MESSAGE" > "$1"
