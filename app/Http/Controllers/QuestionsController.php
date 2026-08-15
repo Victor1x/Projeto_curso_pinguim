@@ -15,7 +15,7 @@ class QuestionsController extends Controller
         //        dd(request()->all());
 
         $attributes = $request->validate([
-            'questions' => 'required|string|max:255',
+            'questions' => 'required|string|max:255|min:10',
         ]);
 
         Questions::query()->create($attributes);

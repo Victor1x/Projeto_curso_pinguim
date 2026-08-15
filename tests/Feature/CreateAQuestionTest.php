@@ -11,7 +11,7 @@ test("pergunda so deve ter 255 caracteris", function () {
     $user = User::factory()->create();
     actingAs($user);
 
-    assertAuthenticated();
+    //    assertAuthenticated(); // VERIFICA SE ESTA LOGADO
 
     // ACT :: AGIR
 
@@ -29,14 +29,31 @@ test("pergunda so deve ter 255 caracteris", function () {
 
 });
 
-it("não posso conseguir mandar uma pergunta sem um ponto de interrogação no final", function () {
-
-    expect(true)->toBeTrue();
-
-})->todo();
-
 it("precisa ter mais do que 10 letras", function () {
 
-    expect(true)->toBeTrue();
+    //ARRANGE :: PREPARA
+
+    $user = User::factory()->create();
+    actingAs($user); // LOGAR
+    assertAuthenticated(); // VERIFICA SE ESTA LOGADO
+
+    // ACT :: AGIR
+    $request = $this->post(route('questions.store'), [
+        "questions" => str_repeat("*", 8) . "?", // str_repeat recebe o que você quer repetir e quantas vezes quer repetir.
+    ]);
+
+    // ASSER :: VERIFICAR
+
+    $request->assertSessionHasErrors(["questions" => __("validation.min.string", ["min" => 10 , "attribute" => "questions"])]);
+    assertDatabaseCount('tb_questions', 0);
+
+    //    assertDatabaseCount('tb_questions', 1);
+    //    assertDatabaseHas("tb_questions", [
+    //        "questions" => str_repeat("*", 254) . "?",
+    //    ]);
+
+});
+
+it("não posso conseguir mandar uma pergunta sem um ponto de interrogação no final", function () {
 
 })->todo();
