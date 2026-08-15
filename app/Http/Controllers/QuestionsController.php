@@ -15,7 +15,17 @@ class QuestionsController extends Controller
         //        dd(request()->all());
 
         $attributes = $request->validate([
-            'questions' => 'required|string|max:255|min:10',
+            'questions' => [
+                'required',
+                'string',
+                'max:255',
+                'min:10',
+                function ($attribute, $value, $fail) {
+                    if (!str_ends_with($value, '?')) {
+                        $fail("Tem certeza de que isso é uma pergunta? Está faltando o ponto de interrogação no final.");
+                    }
+                },
+            ],
         ]);
 
         Questions::query()->create($attributes);

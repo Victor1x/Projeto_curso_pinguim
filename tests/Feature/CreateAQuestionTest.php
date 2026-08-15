@@ -44,16 +44,28 @@ it("precisa ter mais do que 10 letras", function () {
 
     // ASSER :: VERIFICAR
 
-    $request->assertSessionHasErrors(["questions" => __("validation.min.string", ["min" => 10 , "attribute" => "questions"])]);
+    $request->assertSessionHasErrors(["questions" => __("validation.min.string", ["min" => 10, "attribute" => "questions"])]);
     assertDatabaseCount('tb_questions', 0);
-
-    //    assertDatabaseCount('tb_questions', 1);
-    //    assertDatabaseHas("tb_questions", [
-    //        "questions" => str_repeat("*", 254) . "?",
-    //    ]);
-
 });
 
 it("não posso conseguir mandar uma pergunta sem um ponto de interrogação no final", function () {
 
-})->todo();
+    //ARRANGE :: PREPARA
+
+    $user = User::factory()->create();
+    actingAs($user); // LOGAR
+    assertAuthenticated(); // VERIFICA SE ESTA LOGADO
+
+    // ACT :: AGIR
+    $request = $this->post(route('questions.store'), [
+        "questions" => str_repeat("*", 10), // str_repeat recebe o que você quer repetir e quantas vezes quer repetir.
+    ]);
+
+    // ASSER :: VERIFICAR
+    $request->assertSessionHasErrors([
+        "questions" => "Tem certeza de que isso é uma pergunta? Está faltando o ponto de interrogação no final.",
+    ]);
+
+    assertDatabaseCount('tb_questions', 0);
+
+});
